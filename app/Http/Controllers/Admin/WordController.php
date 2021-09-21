@@ -41,7 +41,39 @@ class WordController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // validation rules
+        $request->validate([
+            'title' => 'required|max:255',
+            'content' => 'required',
+            'category_id' => 'nullable|exists:categories,id'
+        ]);
+
+        $data = $request->all();
+
+        // gestione slug
+        $startingSlug = Str::slug($data['title'], '-');
+        $newSlug = $startingSlug;
+        $contatore = 0;
+
+        while(Word::where('slug', $newSlug)->first()){
+
+            $contatore++;
+            $newSlug = $startingSlug . '-' . $contatore;
+        }
+
+        $data['slug'] = $newSlug;
+
+        // creazione istanza, fill e save dei dati
+        $newWord = new Word();
+        $newWord->fill($data);
+        $newWord->save();
+
+        // gestione dei tag
+        if (isSet($data['tags'])) {
+            $newWord->tags()->attach($data['tags']);
+        }
+
+        return redirect()->route('admin.words.index');
     }
 
     /**
