@@ -27,7 +27,10 @@ class WordController extends Controller
      */
     public function create()
     {
-        //
+        $categories = Category::all();
+        $tags = Tag::all();
+
+        return view('admin.posts.create', compact('categories', 'tags'));
     }
 
     /**
@@ -47,9 +50,11 @@ class WordController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($slug)
     {
-        //
+        $word = Word::where('slug', $slug)->first();
+        $tags = Tag::all();
+        return view('admin.words.show', compact('word', 'tags'));
     }
 
     /**
